@@ -10,7 +10,7 @@ Combined with a precise initial condition embedding and a two-stage optimization
 
 We tested inward-breathing, near-constant-radius, outward-breathing dynamical regimes for 4-component and 6-component soliton molecules. The results demonstrate that embedding a known reference propagation at the field-representation level can convert direct full-field PINN approximation into a computationally feasible method.
 efficient learning when the target dynamics remain sufficiently close to a solvable solution
-reference model
+reference model.
 
 ## 🛠️ Environment & Dependencies
 The code is implemented using **PyTorch**. It has been tested on an NVIDIA RTX 4070 SUPER GPU.
