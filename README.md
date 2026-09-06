@@ -23,4 +23,4 @@ The code is implemented using **PyTorch**. It has been tested on an NVIDIA RTX 4
 
 Install dependencies:
 ```bash
-pip install torch==2.9.4 numpy scipy matplotlib
+pip install torch==2.9.1 numpy scipy matplotlib
