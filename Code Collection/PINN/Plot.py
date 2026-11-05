@@ -1,3 +1,18 @@
+"""Generate Figure 2 from the four-component benchmark values in Table 4.
+
+The embedded arrays contain one row per PINN system (M1-M6) and one column
+per dynamical regime, ordered by nu = 0.8, 1.0, and 1.2. The four panels
+show the independent full-domain raw PDE residual MSE, the maximum
+relative complex-field error, the normalized centroid-trajectory error,
+and the wall-clock optimization time in seconds. The first three panels
+use logarithmic vertical axes. The shaded band highlights M4.
+
+Run with python Plot.py. Dependencies are NumPy, Matplotlib, and Pillow.
+All input values are defined in this script. It writes each panel and
+the combined 2-by-2 figure as PNG and PDF files under figure2_outputs/
+in the current working directory.
+"""
+
 from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
