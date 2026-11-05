@@ -1,23 +1,27 @@
+"""Train the two-stage analytical-prior hard-IC PINN (M4).
 
-"""
-hard_ic_two_stage_forward.py
+This script solves the forward problem for a four-component soliton
+molecule at w=0.02 on [-8, 8]^2 x [0, pi/2]. The predicted field is
+psi_a + (z/z_max) * N_theta, where psi_a is the exact w=0 propagation
+field. The factor z/z_max makes the learned correction vanish at z=0
+and enforces the prescribed initial condition.
 
-Revised Two-Stage PINN for the Forward Problem:
+Stage I uses 7,000 Adam updates with a relative squared L2 loss against
+psi_a and a lateral boundary penalty. Stage II uses 3,000 Adam updates,
+adds the w=0.02 PDE residual, and decreases the analytical-prior weight
+from 1.0 to 0.05 on a cosine schedule.
 
-1. Hard initial condition embedding to strictly enforce ψ(x,y,0)=ψ₀(x,y);
-2. Relative L2 loss is adopted for the analytical prior;
-3. Both analytical prior points and PDE collocation points are sampled via a hybrid strategy: global LHS plus enhanced LHS over the beam region;
-4. The first stage learns the analytical prior with w=0;
-5. The second stage solves the PDE with w=0.02, while gradually decaying the weight of the analytical prior;
-6. The SSFM numerical solution at w=0.02 is only used for post-training validation and is never incorporated into the training loss;
-7. The horizontal axis of loss curves corresponds to the true cumulative training iterations;
-8. After training, five types of PDE residual metrics are evaluated on fixed independent LHS test points.
+The default case is v1.2_d2.94. The 500 analytical-prior points and
+10,000 PDE collocation points combine full-domain Latin hypercube
+samples with samples near the constituent trajectories. Edit Config
+and the tags tuple in main() to change the run.
 
-Governing equation:
-    i psi_z + psi_xx + psi_yy
-    + 0.02 |psi|^2 psi - (x^2+y^2) psi = 0.
-
-The default configuration for the study remains a 6×80 network, 2500 analytical prior points, and 20000 PDE collocation points.
+Run with python "Analytical‑Prior‑Hard‑IC‑Full‑Two‑Stage.py".
+Dependencies are PyTorch, NumPy, SciPy, and Matplotlib. Place an optional
+case-matched split-step Fourier method (SSFM) archive, lhs_<tag>.npz,
+beside the script for post-training validation. The script saves model
+checkpoints, field predictions, loss history, and independent PDE
+diagnostics in hard_ic_final_<tag>/ beside the script.
 """
 
 from __future__ import annotations
