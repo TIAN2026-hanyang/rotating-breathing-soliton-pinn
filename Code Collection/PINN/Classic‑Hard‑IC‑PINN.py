@@ -1,46 +1,26 @@
-"""
-classic_hard_ic_pinn_forward_w002_v1d323.py
+"""Train the conventional hard-initial-condition PINN baseline (M2).
 
-Classic hard-IC PINN baseline for the forward problem of the four-soliton molecule.
+This script solves the forward problem for a four-component soliton
+molecule at w=0.02 on [-8, 8]^2 x [0, pi/2]. The field is represented as
+psi_theta(x, y, z) = psi0(x, y) + (z/z_max) * N_theta(x, y, z), where psi0
+is the prescribed input field. The correction vanishes at z=0, so the
+initial condition holds by construction.
 
-Purpose
--------
-Solve the target PDE directly:
+Training uses one Adam loop with a lateral boundary penalty and a PDE
+residual penalty weighted pointwise by 1/(1 + x^2 + y^2)^2. The initial
+condition error is recorded for monitoring. Post-training evaluation
+reports both raw and weighted residuals on independent test points.
 
-    i psi_z + psi_xx + psi_yy
-    + 0.02 |psi|^2 psi - (x^2+y^2) psi = 0.
+The default case is v0.8_d3.60, with 10,000 PDE collocation points and
+10,000 Adam updates. Config.pretrain_steps and Config.finetune_steps are
+summed to set the length of the single Adam loop. Edit Config and the
+tags tuple in main() to change the run.
 
-This is the fair baseline for comparing with the hard-IC analytical-prior PINN.
-
-The baseline network uses only the initial field for hard initial-condition
-embedding:
-
-    psi_theta(x,y,z) = psi0(x,y) + (z/zmax) * N_theta(x,y,z).
-
-It does NOT use the full z-dependent w=0 analytical propagation solution as a
-base. Therefore the main difference from the analytical-prior PINN is:
-
-    Analytical-prior hard-IC PINN:
-        psi_theta = psi_w0(x,y,z) + (z/zmax) * N_theta(x,y,z)
-
-    Classic hard-IC PINN here:
-        psi_theta = psi0(x,y) + (z/zmax) * N_theta(x,y,z)
-
-Kept consistent with the hard-IC code:
-1. Same case: v1.0_d3.23 by default;
-2. Same domain: x,y in [-8,8], z in [0,pi/2];
-3. Same random seed;
-4. Same PDE residual definition with w=0.02;
-5. Same full-domain LHS + beam-enhanced LHS sampling for PDE collocation;
-6. Same optional SSFM validation file: v1.1_matched_slices_data.npz;
-7. Same JSON/CSV/NPZ/PNG style outputs.
-
-Training loss:
-    L = lambda_bc * L_BC + lambda_pde * L_PDE.
-
-The initial condition is enforced by construction and is not used as a soft
-training loss. The SSFM numerical solution is never used for training. It is
-used only after training for validation.
+Run with python "Classic‑Hard‑IC‑PINN.py". Dependencies are PyTorch, NumPy,
+SciPy, and Matplotlib. Place an optional case-matched split-step Fourier
+method (SSFM) archive, lhs_<tag>.npz, beside the script for post-training
+validation. The script saves the model, predictions, training history,
+and independent PDE diagnostics in classic_hard_ic_pinn_<tag>/.
 """
 
 from __future__ import annotations
