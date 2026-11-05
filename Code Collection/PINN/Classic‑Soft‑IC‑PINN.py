@@ -1,44 +1,25 @@
-"""
-classic_pinn_forward_w002_v1d323.py
+"""Train the conventional soft-initial-condition PINN baseline (M1).
 
-Classical PINN baseline for the forward problem of the four-soliton molecule.
+The network maps (x, y, z) directly to the real and imaginary parts of the
+field of a four-component soliton molecule. It solves the forward equation
 
-Purpose
--------
-Use a standard PINN to solve the target PDE directly:
+    i*psi_z + psi_xx + psi_yy + 0.02*|psi|^2*psi - (x^2 + y^2)*psi = 0
 
-    i psi_z + psi_xx + psi_yy
-    + 0.02 |psi|^2 psi - (x^2+y^2) psi = 0.
+on [-8, 8]^2 x [0, pi/2]. The single-stage Adam loss combines a penalty
+for matching the prescribed field at z=0, a lateral boundary penalty, and
+the mean squared PDE residual. PDE collocation combines full-domain Latin
+hypercube sampling with points concentrated near the constituent trajectories.
 
-This is the baseline for comparing with the hard-IC analytical-prior PINN.
-The network is classical:
+The default case is v1.2_d2.94, with 500 initial-condition points, 10,000
+PDE collocation points, and 10,000 Adam updates. Edit Config to change the
+training settings and the tags tuple in main() to select another case.
 
-    psi_theta(x,y,z) = N_theta(x,y,z),
-
-with no analytical base embedding and no hard initial-condition lifting.
-
-Kept consistent with the hard-IC code:
-1. Same case: v1.0_d3.23 by default;
-2. Same domain: x,y in [-8,8], z in [0,pi/2];
-3. Same random seed;
-4. Same PDE residual definition;
-5. Same full-domain LHS + beam-enhanced LHS sampling for PDE collocation;
-6. Same optional SSFM validation file: v1.1_matched_slices_data.npz;
-7. Same JSON/CSV/NPZ/PNG style outputs.
-
-Difference from hard-IC PINN
-----------------------------
-Hard-IC PINN:
-    psi_theta = psi_w0 + (z/zmax) * N_theta.
-
-Classical PINN here:
-    psi_theta = N_theta(x,y,z).
-
-Training loss:
-    L = lambda_ic * L_IC + lambda_bc * L_BC + lambda_pde * L_PDE.
-
-The SSFM numerical solution is never used for training. It is used only after
-training for validation.
+Run with python "Classic‑Soft‑IC‑PINN.py". Dependencies are PyTorch, NumPy,
+SciPy, and Matplotlib. An optional case-matched split-step Fourier method
+(SSFM) archive, lhs_<tag>.npz, can be placed beside the script for
+post-training validation. The script saves the model, field predictions,
+training history, and independent PDE diagnostics in
+classic_soft_ic_pinn_nf<n_f>_<tag>/ beside the script.
 """
 
 from __future__ import annotations
