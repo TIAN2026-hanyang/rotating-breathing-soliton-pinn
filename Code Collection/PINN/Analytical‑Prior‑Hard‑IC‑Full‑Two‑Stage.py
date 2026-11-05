@@ -2,22 +2,22 @@
 """
 hard_ic_two_stage_forward.py
 
-修正后的两阶段 PINN 正问题：
-1. 硬初值嵌入，严格满足 psi(x,y,0)=psi0(x,y)；
-2. 解析先验使用相对 L2 损失；
-3. 解析先验点与 PDE 配点均采用“全域 LHS + 光束区域增强 LHS”混合抽样；
-4. 第一阶段学习 w=0 解析先验；
-5. 第二阶段使用 w=0.02 PDE，逐渐降低解析先验权重；
-6. w=0.02 SSFM 数值解只用于训练后验证，绝不进入训练损失；
-7. 损失曲线横坐标使用真实累计训练迭代次数；
-8. 训练后在固定独立 LHS 测试点上输出五类 PDE 残差指标。
+Revised Two-Stage PINN for the Forward Problem:
+
+1. Hard initial condition embedding to strictly enforce ψ(x,y,0)=ψ₀(x,y);
+2. Relative L2 loss is adopted for the analytical prior;
+3. Both analytical prior points and PDE collocation points are sampled via a hybrid strategy: global LHS plus enhanced LHS over the beam region;
+4. The first stage learns the analytical prior with w=0;
+5. The second stage solves the PDE with w=0.02, while gradually decaying the weight of the analytical prior;
+6. The SSFM numerical solution at w=0.02 is only used for post-training validation and is never incorporated into the training loss;
+7. The horizontal axis of loss curves corresponds to the true cumulative training iterations;
+8. After training, five types of PDE residual metrics are evaluated on fixed independent LHS test points.
 
 方程：
     i psi_z + psi_xx + psi_yy
     + 0.02 |psi|^2 psi - (x^2+y^2) psi = 0.
 
-默认研究配置仍为 6x80 网络、2500 解析点、20000 PDE 点。
-命令行可给出较小配置，用于 CPU 环境的实际运行。
+The default configuration for the study remains a 6×80 network, 2500 analytical prior points, and 20000 PDE collocation points.
 """
 
 from __future__ import annotations
