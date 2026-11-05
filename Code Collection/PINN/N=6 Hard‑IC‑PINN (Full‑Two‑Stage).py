@@ -1,23 +1,26 @@
+"""Train the two-stage analytical-prior hard-IC PINN for six constituents.
 
-"""
-hard_ic_two_stage_forward.py
+This script extends M4 to an alternating-phase six-component soliton
+molecule (N=6, m=3) at w=0.02. The predicted field is
+psi_a + (z/z_max) * N_theta, where psi_a is the exact six-component
+w=0 propagation field. The factor z/z_max enforces the initial condition.
 
-修正后的两阶段 PINN 正问题：
-1. 硬初值嵌入，严格满足 psi(x,y,0)=psi0(x,y)；
-2. 解析先验使用相对 L2 损失；
-3. 解析先验点与 PDE 配点均采用“全域 LHS + 光束区域增强 LHS”混合抽样；
-4. 第一阶段学习 w=0 解析先验；
-5. 第二阶段使用 w=0.02 PDE，逐渐降低解析先验权重；
-6. w=0.02 SSFM 数值解只用于训练后验证，绝不进入训练损失；
-7. 损失曲线横坐标使用真实累计训练迭代次数；
-8. 训练后在固定独立 LHS 测试点上输出五类 PDE 残差指标。
+Stage I uses 7,000 Adam updates with the analytical-prior and lateral
+boundary losses. Stage II uses 3,000 Adam updates, adds the target PDE
+residual, and decreases the analytical-prior weight from 1.0 to 0.05
+on a cosine schedule.
 
-方程：
-    i psi_z + psi_xx + psi_yy
-    + 0.02 |psi|^2 psi - (x^2+y^2) psi = 0.
+The default case is v0.8_d4.00, with 500 analytical-prior points and
+10,000 PDE collocation points. Both sets combine full-domain Latin
+hypercube samples with samples near the constituent trajectories.
+Edit Config and the tags tuple in main() to change the run.
 
-默认研究配置仍为 6x80 网络、2500 解析点、20000 PDE 点。
-命令行可给出较小配置，用于 CPU 环境的实际运行。
+Run with python "N=6 Hard‑IC‑PINN (Full‑Two‑Stage).py". Dependencies
+are PyTorch, NumPy, SciPy, and Matplotlib. For post-training validation,
+place the optional split-step Fourier method (SSFM) archive
+lhs_N6_<tag>.npz beside the script. The script saves model checkpoints,
+field predictions, loss history, and independent PDE diagnostics in
+N6_hard_ic_final_<tag>/ beside the script.
 """
 
 from __future__ import annotations
