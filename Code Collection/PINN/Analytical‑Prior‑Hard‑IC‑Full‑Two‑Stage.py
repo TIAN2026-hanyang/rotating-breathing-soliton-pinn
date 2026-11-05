@@ -13,7 +13,7 @@ Revised Two-Stage PINN for the Forward Problem:
 7. The horizontal axis of loss curves corresponds to the true cumulative training iterations;
 8. After training, five types of PDE residual metrics are evaluated on fixed independent LHS test points.
 
-方程：
+Governing equation:
     i psi_z + psi_xx + psi_yy
     + 0.02 |psi|^2 psi - (x^2+y^2) psi = 0.
 
@@ -1363,7 +1363,6 @@ def train_case(
         dtype=np.float64
     )
 
-    # 先画 PDE（绿色）
     ax.semilogy(
         global_steps,
         pde_history,
@@ -1373,7 +1372,6 @@ def train_case(
         zorder=2,
     )
 
-    # 再画 analytic relative（橙色）
     ax.semilogy(
         global_steps,
         analytic_history,
@@ -1383,7 +1381,6 @@ def train_case(
         zorder=3,
     )
 
-    # 最后画 total（蓝色），保证它不会被盖住
     ax.semilogy(
         global_steps,
         total_history,
@@ -1393,7 +1390,6 @@ def train_case(
         zorder=4,
     )
 
-    # 两阶段分界线：蓝色虚线
     if cfg.pretrain_steps > 0 and cfg.finetune_steps > 0:
         ax.axvline(
             cfg.pretrain_steps,
@@ -1408,7 +1404,6 @@ def train_case(
     ax.set_ylabel("loss")
     ax.grid(True, alpha=0.3)
 
-    # 图例顺序改成你图里那样
     handles, labels = ax.get_legend_handles_labels()
     order = [2, 1, 0, 3]  # total, analytic relative, PDE, PDE fine-tuning starts
     ax.legend([handles[i] for i in order], [labels[i] for i in order], loc="lower left")
@@ -1551,9 +1546,7 @@ def main():
 
 
 def main():
-    # 以后所有训练参数都只改 Config，不再用命令行 parser 覆盖
     cfg = Config()
-    # 只跑 v=1.0, d=3.23 这一组
     tags = ("v1.2_d2.94",)
 
     device = torch.device(
@@ -1579,7 +1572,6 @@ def main():
         json.dump(summaries, file, ensure_ascii=False, indent=2)
 
 # def main():
-#     # 五组随机种子
 #     seeds = (
 #         20260626,
 #         20260627,
@@ -1588,7 +1580,6 @@ def main():
 #         20260630,
 #     )
 #
-#     # 先只测试主 case
 #     tags = ("v1.0_d3.23",)
 #
 #     device = torch.device(
